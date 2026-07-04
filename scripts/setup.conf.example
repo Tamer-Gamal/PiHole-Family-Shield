@@ -1,5 +1,5 @@
 # ============================================================================
-#  Pi-hole setup configuration  —  copy this file to  setup.conf  and edit it
+#  Pi-hole setup configuration  -  copy this file to  setup.conf  and edit it
 # ============================================================================
 #  This is the ONLY file you need to change to build a new Pi-hole.
 #  Lines starting with #  are comments (ignored).  Keep the  KEY="value"  shape.
@@ -15,7 +15,7 @@
 PIHOLE_HOSTNAME="pihole"
 
 # The password for the Pi-hole admin web page. CHANGE THIS.
-# Pick something you will remember — you type it to log into the dashboard.
+# Pick something you will remember - you type it to log into the dashboard.
 PIHOLE_ADMIN_PASSWORD="change-me-please"
 
 # Where Pi-hole sends questions it is allowed to answer (your "upstream" DNS).
@@ -27,7 +27,7 @@ PIHOLE_ADMIN_PASSWORD="change-me-please"
 UPSTREAM_DNS_1="1.1.1.1"
 UPSTREAM_DNS_2="1.0.0.1"
 
-# Set to "true" to also install Unbound — a private recursive resolver that
+# Set to "true" to also install Unbound - a private recursive resolver that
 # removes the need to trust ANY upstream company with your browsing. Recommended
 # for privacy, but adds a couple of minutes to setup. "false" keeps it simple.
 INSTALL_UNBOUND="false"
@@ -40,11 +40,11 @@ ADD_CURATED_BLOCKLISTS="true"
 # FAMILY / KID PROTECTION  (this kit's main purpose)
 # ---------------------------------------------------------------------------
 # "true" turns on the child-safety layer:
-#   • forces SafeSearch on Google, Bing & DuckDuckGo (no adult results)
-#   • forces YouTube "Restricted Mode"
-#   • blocks known adult / pornographic websites for the whole network
+#   - forces SafeSearch on Google, Bing & DuckDuckGo (no adult results)
+#   - forces YouTube "Restricted Mode"
+#   - blocks known adult / pornographic websites for the whole network
 # Honest limit: DNS filtering blocks bad *sites* and forces safe search, but it
-# cannot see inside an allowed site and is not a 100% guarantee — use it WITH
+# cannot see inside an allowed site and is not a 100% guarantee - use it WITH
 # device parental controls (Screen Time / Family Link) and conversations.
 FAMILY_MODE="true"
 
@@ -73,7 +73,7 @@ TIMEZONE="Asia/Riyadh"
 # ADVANCED (most people leave these alone)
 # ---------------------------------------------------------------------------
 
-# Leave empty to keep whatever IP the Pi currently has (recommended — then make
+# Leave empty to keep whatever IP the Pi currently has (recommended - then make
 # a DHCP RESERVATION for it in your router so it never changes). Only set this
 # if you know how to assign a static IP and understand your subnet, e.g.
 #   STATIC_IP="192.168.1.10/24"

@@ -18,11 +18,11 @@ UNBOUND_DST="/etc/unbound/unbound.conf.d/pi-hole.conf"
 
 [ -f "$UNBOUND_SRC" ] || { echo "Missing $UNBOUND_SRC" >&2; exit 1; }
 
-echo "› Installing unbound..."
+echo "> Installing unbound..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y unbound
 
-echo "› Fetching the root hints (list of internet root servers)..."
+echo "> Fetching the root hints (list of internet root servers)..."
 mkdir -p /var/lib/unbound
 if curl -fsSL -o /var/lib/unbound/root.hints https://www.internic.net/domain/named.root; then
   chown unbound:unbound /var/lib/unbound/root.hints 2>/dev/null || true
@@ -31,24 +31,24 @@ else
   echo "  ! Could not download root.hints (unbound ships a built-in copy; continuing)."
 fi
 
-echo "› Installing Unbound config for Pi-hole..."
+echo "> Installing Unbound config for Pi-hole..."
 install -m 0644 "$UNBOUND_SRC" "$UNBOUND_DST"
 
-echo "› Restarting unbound..."
+echo "> Restarting unbound..."
 systemctl enable unbound >/dev/null 2>&1 || true
 systemctl restart unbound
 
-echo "› Testing that Unbound resolves + validates DNSSEC..."
+echo "> Testing that Unbound resolves + validates DNSSEC..."
 sleep 1
 if command -v dig >/dev/null 2>&1; then
   if dig +short @127.0.0.1 -p 5335 pi-hole.net >/dev/null 2>&1; then
     echo "  ✔ Unbound answered a query on 127.0.0.1#5335"
   else
-    echo "  ! Unbound did not answer yet — check: systemctl status unbound"
+    echo "  ! Unbound did not answer yet - check: systemctl status unbound"
   fi
 fi
 
-echo "› Pointing Pi-hole's upstream DNS at Unbound (127.0.0.1#5335)..."
+echo "> Pointing Pi-hole's upstream DNS at Unbound (127.0.0.1#5335)..."
 if command -v pihole-FTL >/dev/null 2>&1 && pihole-FTL --config dns.upstreams >/dev/null 2>&1; then
   # Pi-hole v6: single source of truth is pihole.toml, set via pihole-FTL --config
   pihole-FTL --config dns.upstreams '[ "127.0.0.1#5335" ]'

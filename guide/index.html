@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pi-hole — Home Shield Setup Guide</title>
+<title>Pi-hole - Home Shield Setup Guide</title>
 <style>
   /* ---- tokens ---------------------------------------------------------- */
   :root{
@@ -145,7 +145,7 @@
   summary{cursor:pointer; padding:14px 16px; font-weight:700; list-style:none; display:flex; gap:10px; align-items:center}
   summary::-webkit-details-marker{display:none}
   summary::before{content:"+"; color:var(--safe); font-weight:900; font-size:1.2rem; width:16px}
-  details[open] summary::before{content:"–"}
+  details[open] summary::before{content:"-"}
   details .body{padding:0 16px 16px 42px; color:var(--muted); max-width:var(--measure)}
   details .body p{margin:8px 0}
 
@@ -187,17 +187,17 @@
 <header class="wrap hero">
   <div>
     <span class="eyebrow">Homelab · a family-safety project anyone can do</span>
-    <h1>Protect your kids — and block ads — across your <span style="color:var(--safe)">whole home</span>.</h1>
-    <p class="lede">Pi-hole is a tiny guard that sits between your family’s devices and the internet. It forces
+    <h1>Protect your kids and block ads across your <span style="color:var(--safe)">whole home</span>.</h1>
+    <p class="lede">Pi-hole is a tiny guard that sits between your family's devices and the internet. It forces
       <b>SafeSearch</b>, restricts <b>YouTube</b>, and blocks <b>adult</b>, scam, malware, and ad/tracker sites
-      for <b>every</b> phone, laptop, TV, and console on your Wi-Fi — with nothing to install on each one.</p>
+      for <b>every</b> phone, laptop, TV, and console on your Wi-Fi - with nothing to install on each one.</p>
     <div class="tags">
-      <span class="tag">👨‍👩‍👧 <b>Family-first</b></span>
-      <span class="tag">⏱️ <b>~45 min</b></span>
-      <span class="tag">🧠 <b>No coding</b></span>
-      <span class="tag">🔁 <b>Repeatable for friends</b></span>
+      <span class="tag"><b>Family-first</b></span>
+      <span class="tag"><b>~45 min</b></span>
+      <span class="tag"><b>No coding</b></span>
+      <span class="tag"><b>Repeatable for friends</b></span>
     </div>
-    <p style="margin-top:20px; font-size:.92rem; color:var(--muted)">Built on <a href="https://pi-hole.net" target="_blank" rel="noopener"><b>Pi-hole®</b></a> — the free,
+    <p style="margin-top:20px; font-size:.92rem; color:var(--muted)">Built on <a href="https://pi-hole.net" target="_blank" rel="noopener"><b>Pi-hole®</b></a> - the free,
       open-source network blocker (<a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">source on GitHub</a>).
       This kit installs it from the official installer and adds family filtering, setup scripts &amp; this guide on top.</p>
   </div>
@@ -243,7 +243,7 @@
       </g>
     </svg>
     <p style="color:var(--muted);font-size:.86rem;margin:12px 4px 0;text-align:center">
-      Same page. <span style="color:var(--blocked);font-weight:700">Ads blocked</span> before they ever load — so pages are faster too.</p>
+      Same page. <span style="color:var(--blocked);font-weight:700">Ads blocked</span> before they ever load - so pages are faster too.</p>
   </div>
 </header>
 
@@ -273,9 +273,9 @@
       <span class="eyebrow">The idea</span>
       <h2><span class="num">i.</span> How a little box blocks ads everywhere</h2>
       <div class="prose">
-        <p>Every time a device opens a website, it first asks a <b>phone book of the internet</b> — called
-          <b>DNS</b> — “what’s the address for this name?”. Ads and trackers come from their own names
-          (like <code>ads.example.com</code>). Pi-hole becomes your home’s phone book, and simply
+        <p>Every time a device opens a website, it first asks a <b>phone book of the internet</b> - called
+          <b>DNS</b> - "what's the address for this name?". Ads and trackers come from their own names
+          (like <code>ads.example.com</code>). Pi-hole becomes your home's phone book, and simply
           <b>refuses to look up the bad names</b>. If the address is never found, the ad never loads.</p>
       </div>
       <figure class="figure">
@@ -287,7 +287,7 @@
           </g>
           <!-- arrow to pihole -->
           <line x1="112" y1="110" x2="250" y2="110" stroke="var(--faint)" stroke-width="2" marker-end="url(#ar)"/>
-          <text x="181" y="100" text-anchor="middle" fill="var(--muted)" font-size="11">“address for…?”</text>
+          <text x="181" y="100" text-anchor="middle" fill="var(--muted)" font-size="11">"address for...?"</text>
           <!-- pihole shield -->
           <g transform="translate(258,58)">
             <rect x="0" y="0" width="150" height="104" rx="14" fill="var(--raised)" stroke="var(--safe)"/>
@@ -318,7 +318,7 @@
           <span class="swatch" style="background:var(--blocked)"></span>ad &amp; malware names.</figcaption>
       </figure>
       <div class="callout safe"><b>Why it protects the whole house:</b> because every device already uses DNS,
-        you only change it in <i>one</i> place — your router — and every gadget is covered at once.</div>
+        you only change it in <i>one</i> place - your router - and every gadget is covered at once.</div>
     </section>
 
     <!-- FAMILY SAFETY -->
@@ -326,53 +326,53 @@
       <span class="eyebrow">Family safety · the main reason to do this</span>
       <h2><span class="num">♥</span> What your family is protected from</h2>
       <p class="prose">This kit is built <b>for families first</b>. When you run the installer with family mode on
-        (it’s the default), the same DNS trick that blocks ads is used to keep the whole network kid-safer —
+        (it's the default), the same DNS trick that blocks ads is used to keep the whole network kid-safer -
         automatically, on every device.</p>
       <div class="grid2">
-        <div class="card"><h3>🔍 SafeSearch, forced</h3>
+        <div class="card"><h3>SafeSearch, forced</h3>
           <p style="color:var(--muted)">Google, Bing and DuckDuckGo are quietly locked into <b>SafeSearch</b>, so
-            adult results and images don’t show up — even if a child turns SafeSearch off in the browser.</p></div>
-        <div class="card"><h3>▶️ YouTube restricted</h3>
+            adult results and images don't show up - even if a child turns SafeSearch off in the browser.</p></div>
+        <div class="card"><h3>YouTube restricted</h3>
           <p style="color:var(--muted)">YouTube is put into <b>Restricted Mode</b>, which hides mature videos and
             comments across the network.</p></div>
-        <div class="card"><h3>🚫 Adult sites blocked</h3>
+        <div class="card"><h3>Adult sites blocked</h3>
           <p style="color:var(--muted)">Known <b>pornographic and adult</b> websites are blocked for every device,
             using actively-maintained family blocklists.</p></div>
-        <div class="card"><h3>🎰 Gambling &amp; scams</h3>
+        <div class="card"><h3>Gambling &amp; scams</h3>
           <p style="color:var(--muted)">Gambling/betting sites and known <b>scam, phishing and malware</b> domains
-            are blocked too — protecting wallets as well as eyes.</p></div>
+            are blocked too - protecting wallets as well as eyes.</p></div>
       </div>
-      <div class="callout warn"><b>Please read — no filter is perfect.</b> DNS filtering blocks known bad
-        <i>websites</i> and forces safe search, but it <b>cannot</b> see inside a site you allow (that’s what
+      <div class="callout warn"><b>Please read - no filter is perfect.</b> DNS filtering blocks known bad
+        <i>websites</i> and forces safe search, but it <b>cannot</b> see inside a site you allow (that's what
         <b>Layer 2 · HaramBlur</b> below is for), <b>cannot</b> catch a brand-new adult site until the lists update,
-        and a determined, tech-savvy child can bypass it with a VPN. Treat this as a strong <i>first</i> layer — use it
+        and a determined, tech-savvy child can bypass it with a VPN. Treat this as a strong <i>first</i> layer - use it
         <b>together with</b> device parental controls (Apple Screen Time, Google Family Link) and honest conversations.
         It is not a substitute for supervision.</div>
 
-      <h3 style="margin:30px 0 4px">🧩 Layer 2 · HaramBlur — blur what Pi-hole can’t see inside</h3>
-      <p class="prose">Pi-hole guards the <b>network</b>, so it can’t reach <i>inside</i> a page it allows.
+      <h3 style="margin:30px 0 4px">Layer 2 · HaramBlur - blur what Pi-hole can't see inside</h3>
+      <p class="prose">Pi-hole guards the <b>network</b>, so it can't reach <i>inside</i> a page it allows.
         <b>HaramBlur</b> closes that gap: a free, open-source browser add-on that uses <b>on-device AI</b> to
-        automatically <b>blur inappropriate images &amp; videos right on the page</b> — the perfect companion to Pi-hole.
-        Install it in each family member’s browser.</p>
+        automatically <b>blur inappropriate images and videos right on the page</b>. Install it in each family
+        member's browser and it works right away, no Pi-hole changes needed.</p>
       <div class="grid2">
         <div class="card"><h3>Install (per browser)</h3>
           <p style="color:var(--muted)"><a href="https://chrome.google.com/webstore/detail/haramblur/pbcoegikffnadpahojjhgdladmmddeji" target="_blank" rel="noopener"><b>Chrome / Edge / Brave</b></a>
-            &nbsp;·&nbsp; <a href="https://addons.mozilla.org/addon/haramblur/" target="_blank" rel="noopener"><b>Firefox</b></a>
+             /  <a href="https://addons.mozilla.org/addon/haramblur/" target="_blank" rel="noopener"><b>Firefox</b></a>
             (also Firefox for Android). Then set the blur strength &amp; strictness in its pop-up.</p></div>
         <div class="card"><h3>Private &amp; on-device</h3>
-          <p style="color:var(--muted)">All detection runs <b>in the browser</b> — it doesn’t send your browsing
+          <p style="color:var(--muted)">All detection runs <b>in the browser</b> - it doesn't send your browsing
             anywhere. Open-source (AGPL-3.0). Because the AI runs on the device, it can use noticeable CPU on older
-            phones/laptops — lower the strictness or pause it if a device struggles.</p></div>
+            phones/laptops - lower the strictness or pause it if a device struggles.</p></div>
       </div>
       <div class="callout safe"><b>Two layers, one goal.</b> Pi-hole stops bad <i>sites</i> for every device on the
         network; HaramBlur blurs bad <i>images</i> on the sites that remain. Together they cover far more than either
         alone. HaramBlur is a separate project
         (<a href="https://github.com/alganzory/HaramBlur" target="_blank" rel="noopener">github.com/alganzory/HaramBlur</a>),
-        not part of this kit — install it per browser; it needs no Pi-hole changes.</div>
+        not part of this kit - install it per browser; it needs no Pi-hole changes.</div>
 
       <details><summary>Make it harder to bypass (optional, for older kids)</summary>
         <div class="body"><p>In <code>setup.conf</code> set <code>BLOCK_DNS_BYPASS="true"</code> to also block the
-          VPN / “private DNS” tricks kids use to escape the filter — then, in your router, force <b>all</b> devices to
+          VPN / "private DNS" tricks kids use to escape the filter - then, in your router, force <b>all</b> devices to
           use only this Pi for DNS. Heads-up: this can also block a VPN <i>you</i> use for work, so turn it on only if
           you understand that trade-off.</p></div></details>
     </section>
@@ -381,16 +381,16 @@
     <section class="step" id="s-need" data-step="need">
       <span class="eyebrow">Step 1</span>
       <h2><span class="num">1.</span> Gather what you need</h2>
-      <p class="prose">Tick these off. Any recent Raspberry Pi works — a Pi 4 is the sweet spot, but a Pi 3,
+      <p class="prose">Tick these off. Any recent Raspberry Pi works - a Pi 4 is the sweet spot, but a Pi 3,
         Pi 5, or even a Pi Zero 2 W will happily block ads for a busy household.</p>
       <ul class="checks" data-step="need">
-        <li class="chk"><input type="checkbox" data-key="need-pi"><span class="t"><b>A Raspberry Pi</b> — Pi 3 / 4 / 5 or Zero 2 W, with its power supply.</span></li>
-        <li class="chk"><input type="checkbox" data-key="need-sd"><span class="t"><b>A microSD card</b> — 8 GB or larger.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-pi"><span class="t"><b>A Raspberry Pi</b> - Pi 3 / 4 / 5 or Zero 2 W, with its power supply.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-sd"><span class="t"><b>A microSD card</b> - 8 GB or larger.</span></li>
         <li class="chk"><input type="checkbox" data-key="need-reader"><span class="t"><b>An SD card reader</b> for your computer.</span></li>
-        <li class="chk"><input type="checkbox" data-key="need-net"><span class="t"><b>A network connection</b> for the Pi — an Ethernet cable is easiest; Wi-Fi also works.</span></li>
-        <li class="chk"><input type="checkbox" data-key="need-router"><span class="t"><b>Access to your router’s settings</b> — the sticker on it usually has the web address, username &amp; password.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-net"><span class="t"><b>A network connection</b> for the Pi - an Ethernet cable is easiest; Wi-Fi also works.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-router"><span class="t"><b>Access to your router's settings</b> - the sticker on it usually has the web address, username &amp; password.</span></li>
       </ul>
-      <div class="callout tip"><b>Tip:</b> plug the Pi in with an Ethernet cable if you can. It’s more reliable
+      <div class="callout tip"><b>Tip:</b> plug the Pi in with an Ethernet cable if you can. It's more reliable
         for an always-on box, and it skips the Wi-Fi setup entirely.</div>
     </section>
 
@@ -398,17 +398,17 @@
     <section class="step" id="s-flash" data-step="flash">
       <span class="eyebrow">Step 2</span>
       <h2><span class="num">2.</span> Put the operating system on the card</h2>
-      <p class="prose">You’ll use the free, official <b>Raspberry Pi Imager</b> app to write “Raspberry Pi OS
-        Lite” onto the microSD card. “Lite” has no desktop — perfect for a box that just quietly runs.</p>
+      <p class="prose">You'll use the free, official <b>Raspberry Pi Imager</b> app to write "Raspberry Pi OS
+        Lite" onto the microSD card. "Lite" has no desktop - perfect for a box that just quietly runs.</p>
       <ul class="checks" data-step="flash">
         <li class="chk"><input type="checkbox" data-key="flash-imager"><span class="t">Install <b>Raspberry Pi Imager</b> from <a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">raspberrypi.com/software</a>.</span></li>
-        <li class="chk"><input type="checkbox" data-key="flash-os"><span class="t">Choose OS → <b>Raspberry Pi OS Lite (64-bit)</b>. Choose your microSD as the storage.</span></li>
+        <li class="chk"><input type="checkbox" data-key="flash-os"><span class="t">Choose OS -> <b>Raspberry Pi OS Lite (64-bit)</b>. Choose your microSD as the storage.</span></li>
         <li class="chk"><input type="checkbox" data-key="flash-edit"><span class="t">Click <b>Edit Settings</b> and set: hostname <code>pihole</code>, a username + password, your Wi-Fi (if not using Ethernet), and your timezone.</span></li>
         <li class="chk"><input type="checkbox" data-key="flash-ssh"><span class="t">In the <b>Services</b> tab, turn on <b>SSH</b> (password authentication). This lets you control the Pi with no screen attached.</span></li>
         <li class="chk"><input type="checkbox" data-key="flash-write"><span class="t"><b>Write</b> the card, then put it in the Pi, connect the network, and power it on. Wait ~90 seconds.</span></li>
       </ul>
-      <div class="callout warn"><b>Double-check the storage you pick</b> in the Imager — writing the card erases
-        everything on it. Make sure it’s the SD card, not a USB drive you care about.</div>
+      <div class="callout warn"><b>Double-check the storage you pick</b> in the Imager - writing the card erases
+        everything on it. Make sure it's the SD card, not a USB drive you care about.</div>
       <p class="prose" style="color:var(--muted);font-size:.95rem">Full picture-by-picture version:
         <code>pi-hole/scripts/flash-and-first-boot.md</code></p>
     </section>
@@ -417,14 +417,14 @@
     <section class="step" id="s-connect" data-step="connect">
       <span class="eyebrow">Step 3</span>
       <h2><span class="num">3.</span> Connect to the Pi from your computer</h2>
-      <p class="prose">Open a terminal — on Windows that’s <b>PowerShell</b> or <b>Windows Terminal</b>; on Mac
-        it’s <b>Terminal</b>. Type this (use the username you chose), and enter the password when asked:</p>
+      <p class="prose">Open a terminal - on Windows that's <b>PowerShell</b> or <b>Windows Terminal</b>; on Mac
+        it's <b>Terminal</b>. Type this (use the username you chose), and enter the password when asked:</p>
       <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="prompt">$ </span>ssh pi@pihole.local</code></pre></div>
-      <div class="callout tip"><b>If <code>pihole.local</code> doesn’t work:</b> open your router’s device list,
-        find the Pi’s IP address (like <code>192.168.1.42</code>), and use
+      <div class="callout tip"><b>If <code>pihole.local</code> doesn't work:</b> open your router's device list,
+        find the Pi's IP address (like <code>192.168.1.42</code>), and use
         <code>ssh pi@192.168.1.42</code> instead. Say <span class="kbd">yes</span> the first time it asks about a fingerprint.</div>
       <ul class="checks" data-step="connect">
-        <li class="chk"><input type="checkbox" data-key="connect-in"><span class="t">You see a prompt ending in <code>pihole:~ $</code> — you’re <b>inside the Pi</b>. 🎉</span></li>
+        <li class="chk"><input type="checkbox" data-key="connect-in"><span class="t">You see a prompt ending in <code>pihole:~ $</code> - you're <b>inside the Pi</b>. 🎉</span></li>
       </ul>
     </section>
 
@@ -449,18 +449,18 @@
         <code>INSTALL_UNBOUND="true"</code> too.) Then run the installer:</p>
       <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="prompt">$ </span>sudo ./bootstrap.sh</code></pre></div>
       <div class="callout safe"><b>Where does Pi-hole actually come from?</b> This kit ships <b>no</b> copy of Pi-hole.
-        Under the hood, <code>bootstrap.sh</code> downloads and runs Pi-hole’s <b>official installer</b> straight from
-        the real project — <a href="https://install.pi-hole.net" target="_blank" rel="noopener">install.pi-hole.net</a>
+        Under the hood, <code>bootstrap.sh</code> downloads and runs Pi-hole's <b>official installer</b> straight from
+        the real project - <a href="https://install.pi-hole.net" target="_blank" rel="noopener">install.pi-hole.net</a>
         (source: <a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">github.com/pi-hole/pi-hole</a>,
         website <a href="https://pi-hole.net" target="_blank" rel="noopener">pi-hole.net</a>). So you always get their
         genuine, security-patched release; our scripts only add the family filtering and setup on top.</div>
       <ul class="checks" data-step="install">
         <li class="chk"><input type="checkbox" data-key="install-pw"><span class="t">Changed <b>PIHOLE_ADMIN_PASSWORD</b> in <code>setup.conf</code>.</span></li>
-        <li class="chk"><input type="checkbox" data-key="install-run"><span class="t">Ran <code>sudo ./bootstrap.sh</code> and it finished with <b>“Pi-hole is ready!”</b> and an admin address.</span></li>
+        <li class="chk"><input type="checkbox" data-key="install-run"><span class="t">Ran <code>sudo ./bootstrap.sh</code> and it finished with <b>"Pi-hole is ready!"</b> and an admin address.</span></li>
         <li class="chk"><input type="checkbox" data-key="install-note"><span class="t">Wrote down the <b>admin page address</b> it printed (like <code>http://192.168.1.42/admin</code>).</span></li>
       </ul>
-      <div class="callout safe"><b>It’s safe to re-run.</b> If anything hiccups (a dropped connection, a slow
-        mirror), just run <code>sudo ./bootstrap.sh</code> again — it picks up where it left off.</div>
+      <div class="callout safe"><b>It's safe to re-run.</b> If anything hiccups (a dropped connection, a slow
+        mirror), just run <code>sudo ./bootstrap.sh</code> again - it picks up where it left off.</div>
     </section>
 
     <!-- ROUTER -->
@@ -468,7 +468,7 @@
       <span class="eyebrow">Step 5 · the important one</span>
       <h2><span class="num">5.</span> Send your whole network through Pi-hole</h2>
       <p class="prose">Right now only the Pi knows about itself. This step tells <b>your router</b> to hand out
-        the Pi as everyone’s phone book — so every device is protected automatically.</p>
+        the Pi as everyone's phone book - so every device is protected automatically.</p>
       <figure class="figure">
         <svg viewBox="0 0 720 250" role="img" aria-label="The internet connects to your router. The router points all devices at the Pi-hole for DNS. Phones, laptops and TVs are all covered.">
           <!-- internet -->
@@ -481,7 +481,7 @@
           <g transform="translate(214,96)">
             <rect x="0" y="0" width="120" height="60" rx="10" fill="var(--raised-2)" stroke="var(--hair)"/>
             <text x="60" y="27" text-anchor="middle" fill="var(--ink)" font-size="13">Router</text>
-            <text x="60" y="45" text-anchor="middle" fill="var(--muted)" font-size="10.5">“use the Pi for DNS”</text>
+            <text x="60" y="45" text-anchor="middle" fill="var(--muted)" font-size="10.5">"use the Pi for DNS"</text>
           </g>
           <!-- to pihole -->
           <line x1="334" y1="126" x2="418" y2="126" stroke="var(--safe)" stroke-width="2.4" marker-end="url(#arg2)"/>
@@ -507,57 +507,57 @@
             <marker id="arg2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0l9 4.5L0 9z" fill="var(--safe)"/></marker>
           </defs>
         </svg>
-        <figcaption>Change DNS in <b>one</b> place — the router — and every device is covered.</figcaption>
+        <figcaption>Change DNS in <b>one</b> place - the router - and every device is covered.</figcaption>
       </figure>
       <div class="grid2">
         <div class="card"><h3>Do this (recommended)</h3>
-          <p style="color:var(--muted)">In your router’s settings, find <b>DHCP</b> or <b>LAN</b> settings and set the
-            <b>DNS server</b> to your Pi’s IP address (the one from Step 4). Save, then reboot your devices (or turn
+          <p style="color:var(--muted)">In your router's settings, find <b>DHCP</b> or <b>LAN</b> settings and set the
+            <b>DNS server</b> to your Pi's IP address (the one from Step 4). Save, then reboot your devices (or turn
             Wi-Fi off &amp; on).</p></div>
         <div class="card"><h3>Also do this</h3>
-          <p style="color:var(--muted)">While you’re in the router, make a <b>DHCP reservation</b> for the Pi so its
-            address never changes. Look for “Reserve IP”, “Static lease”, or “Address reservation”, and pin the Pi
+          <p style="color:var(--muted)">While you're in the router, make a <b>DHCP reservation</b> for the Pi so its
+            address never changes. Look for "Reserve IP", "Static lease", or "Address reservation", and pin the Pi
             to its current IP.</p></div>
       </div>
       <ul class="checks" data-step="router">
-        <li class="chk"><input type="checkbox" data-key="router-dns"><span class="t">Set the router’s <b>DNS</b> to the Pi’s IP address.</span></li>
+        <li class="chk"><input type="checkbox" data-key="router-dns"><span class="t">Set the router's <b>DNS</b> to the Pi's IP address.</span></li>
         <li class="chk"><input type="checkbox" data-key="router-reserve"><span class="t">Made a <b>DHCP reservation</b> so the Pi keeps the same address.</span></li>
         <li class="chk"><input type="checkbox" data-key="router-reboot"><span class="t">Rebooted a device (or toggled Wi-Fi) so it picks up the new setting.</span></li>
       </ul>
-      <div class="callout warn"><b>Every router’s menus are named differently.</b> If you can’t find the DNS field,
-        search the web for <i>“[your router model] change DNS DHCP”</i>. The setting always exists — it’s just
+      <div class="callout warn"><b>Every router's menus are named differently.</b> If you can't find the DNS field,
+        search the web for <i>"[your router model] change DNS DHCP"</i>. The setting always exists - it's just
         hidden in a different place.</div>
     </section>
 
     <!-- VERIFY -->
     <section class="step" id="s-verify" data-step="verify">
       <span class="eyebrow">Step 6</span>
-      <h2><span class="num">6.</span> Check that it’s working</h2>
+      <h2><span class="num">6.</span> Check that it's working</h2>
       <p class="prose">Open the admin page (the address from Step 4) and log in with your password. Then browse
         the web for a minute and watch the numbers move.</p>
       <ul class="checks" data-step="verify">
         <li class="chk"><input type="checkbox" data-key="verify-admin"><span class="t">The <b>admin dashboard</b> loads and you can log in.</span></li>
-        <li class="chk"><input type="checkbox" data-key="verify-queries"><span class="t"><b>“Total queries”</b> is climbing — proof your devices are using the Pi.</span></li>
-        <li class="chk"><input type="checkbox" data-key="verify-blocked"><span class="t"><b>“Queries blocked”</b> is above zero — ads &amp; trackers are being stopped.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-queries"><span class="t"><b>"Total queries"</b> is climbing - proof your devices are using the Pi.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-blocked"><span class="t"><b>"Queries blocked"</b> is above zero - ads &amp; trackers are being stopped.</span></li>
         <li class="chk"><input type="checkbox" data-key="verify-feel"><span class="t">Sites feel a little <b>cleaner and faster</b>. 🎉</span></li>
-        <li class="chk"><input type="checkbox" data-key="verify-safesearch"><span class="t"><b>Family check:</b> on a device using the Pi, a Google image search for something mild-but-adult stays <b>SafeSearch-clean</b>, and a known adult site <b>won’t open</b>.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-safesearch"><span class="t"><b>Family check:</b> on a device using the Pi, a Google image search for something mild-but-adult stays <b>SafeSearch-clean</b>, and a known adult site <b>won't open</b>.</span></li>
       </ul>
       <div class="callout tip"><b>Want a definite test?</b> On a device using the Pi, visit
-        <code>http://pi.hole/admin</code> — if it opens, your device is going through Pi-hole. Many ad-heavy
-        news sites are the most satisfying “before/after”.</div>
+        <code>http://pi.hole/admin</code> - if it opens, your device is going through Pi-hole. Many ad-heavy
+        news sites are the most satisfying "before/after".</div>
 
       <h3 style="margin:28px 0 4px">If something looks off</h3>
-      <details><summary>A website or app won’t load / a login is blocked</summary>
-        <div class="body"><p>Very rarely a blocklist is too aggressive. Open the admin page → <b>Query Log</b>,
+      <details><summary>A website or app won't load / a login is blocked</summary>
+        <div class="body"><p>Very rarely a blocklist is too aggressive. Open the admin page -> <b>Query Log</b>,
           find the <span style="color:var(--blocked)">red (blocked)</span> domain the site needs, and click
-          <b>Allow</b>. It’ll work within seconds — no reinstall needed.</p></div></details>
-      <details><summary>Numbers aren’t moving / devices aren’t using Pi-hole</summary>
+          <b>Allow</b>. It'll work within seconds - no reinstall needed.</p></div></details>
+      <details><summary>Numbers aren't moving / devices aren't using Pi-hole</summary>
         <div class="body"><p>The router DNS change (Step 5) usually needs a device reboot or a Wi-Fi off/on to
           take effect. Also confirm the Pi still has the same IP you set in the router. On the Pi you can run
-          <code>pihole status</code> to confirm it’s active.</p></div></details>
-      <details><summary>The Pi’s address changed and nothing resolves</summary>
-        <div class="body"><p>That’s why the DHCP <b>reservation</b> in Step 5 matters. Find the Pi’s new IP in
-          the router, update the router’s DNS setting to match, and make the reservation so it can’t drift again.</p></div></details>
+          <code>pihole status</code> to confirm it's active.</p></div></details>
+      <details><summary>The Pi's address changed and nothing resolves</summary>
+        <div class="body"><p>That's why the DHCP <b>reservation</b> in Step 5 matters. Find the Pi's new IP in
+          the router, update the router's DNS setting to match, and make the reservation so it can't drift again.</p></div></details>
     </section>
 
     <!-- FRIENDS -->
@@ -571,25 +571,25 @@
             and run <code>sudo ./bootstrap.sh</code>. Identical result, every time.</p></div>
         <div class="card"><h3>Clone an existing one</h3>
           <p style="color:var(--muted)">On your working Pi run <code>sudo ./backup.sh</code> to save a
-            <b>Teleporter</b> file, then on the new Pi restore it from <b>Settings → Teleporter → Restore</b> to copy
+            <b>Teleporter</b> file, then on the new Pi restore it from <b>Settings -> Teleporter -> Restore</b> to copy
             your exact allow/block lists.</p></div>
       </div>
-      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="cmt"># on your working Pi — save a portable backup you can restore anywhere</span>
+      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="cmt"># on your working Pi - save a portable backup you can restore anywhere</span>
 <span class="prompt">$ </span>sudo ./backup.sh</code></pre></div>
       <div class="callout safe"><b>Keep them healthy:</b> once a month, run <code>sudo ./update.sh</code> on each Pi
         to update the system, Pi-hole, and the blocklists.</div>
     </section>
 
     <footer>
-      <p><b>Home Shield</b> — a Homelab-Hive project. Everything here runs on your own Raspberry Pi; it’s independent
+      <p><b>Home Shield</b> - a Homelab-Hive project. Everything here runs on your own Raspberry Pi; it's independent
         of any other homelab service. Your progress on this page is saved only in <i>this browser</i>, on
-        <i>this device</i> — nothing is uploaded.</p>
-      <p style="margin-top:10px">Made to be shared. Flash a card, hand a friend the address, and they’re protected in
+        <i>this device</i> - nothing is uploaded.</p>
+      <p style="margin-top:10px">Made to be shared. Flash a card, hand a friend the address, and they're protected in
         an afternoon.</p>
       <p style="margin-top:10px"><b>Credits:</b> Pi-hole® is free, open-source software by the Pi-hole team
         (<a href="https://pi-hole.net" target="_blank" rel="noopener">pi-hole.net</a> ·
         <a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">source on GitHub</a>). This kit
-        <i>installs</i> Pi-hole from its official installer and adds configuration + this guide on top — it is an
+        <i>installs</i> Pi-hole from its official installer and adds configuration + this guide on top - it is an
         independent project, not affiliated with or endorsed by the Pi-hole team. SafeSearch enforcement and the
         blocklists are provided by their respective maintainers (HaGeZi, OISD, and others).</p>
     </footer>

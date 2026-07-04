@@ -17,8 +17,8 @@
 #
 #  Idempotent: safe to run again. Works on Pi-hole v6 (preferred) and v5.
 #
-#  ⚠️  HONEST LIMITS: DNS filtering blocks known bad *domains* and forces safe
-#  search — it cannot see inside an allowed website, cannot catch brand-new
+#    HONEST LIMITS: DNS filtering blocks known bad *domains* and forces safe
+#  search - it cannot see inside an allowed website, cannot catch brand-new
 #  adult sites until the lists update, and can be bypassed with a VPN unless you
 #  also enable BLOCK_DNS_BYPASS and point the router's DNS only at this Pi. Use
 #  it WITH device parental controls (Screen Time / Family Link) and conversation.
@@ -45,9 +45,9 @@ FAMILY_GOOGLE_CCTLD=""
 command -v sqlite3 >/dev/null 2>&1 || { echo "sqlite3 required: apt-get install -y sqlite3" >&2; exit 1; }
 [ -f "$GRAVITY_DB" ] || { echo "Install Pi-hole first (bootstrap.sh)." >&2; exit 1; }
 
-echo "════════════════════════════════════════════════"
+echo "================================================"
 echo "  Applying family / parental protection"
-echo "════════════════════════════════════════════════"
+echo "================================================"
 
 # ---------------------------------------------------------------------------
 # 1 + 2.  Force SafeSearch + YouTube Restricted Mode via DNS CNAMEs
@@ -55,7 +55,7 @@ echo "════════════════════════�
 YT_TARGET="restrict.youtube.com"
 [ "$YOUTUBE_MODE" = "moderate" ] && YT_TARGET="restrictmoderate.youtube.com"
 
-# "from,to" — asking for <from> transparently returns the safe <to> instead.
+# "from,to" - asking for <from> transparently returns the safe <to> instead.
 MAPPINGS=(
   "www.google.com,forcesafesearch.google.com"
   "google.com,forcesafesearch.google.com"
@@ -75,7 +75,7 @@ if [ -n "$FAMILY_GOOGLE_CCTLD" ]; then
   MAPPINGS+=("www.$FAMILY_GOOGLE_CCTLD,forcesafesearch.google.com")
 fi
 
-echo "› Forcing SafeSearch + YouTube Restricted Mode ($YOUTUBE_MODE)..."
+echo "> Forcing SafeSearch + YouTube Restricted Mode ($YOUTUBE_MODE)..."
 if command -v pihole-FTL >/dev/null 2>&1 && pihole-FTL --config dns.cnameRecords >/dev/null 2>&1; then
   # Pi-hole v6: one TOML array of "from,to" strings.
   JSON="["
@@ -106,24 +106,24 @@ add_adlist() {  # $1=url  $2=comment
   fi
 }
 
-echo "› Adding adult / NSFW blocklists..."
+echo "> Adding adult / NSFW blocklists..."
 if [ -f "$FAMILY_LIST" ]; then
   while IFS= read -r raw || [ -n "$raw" ]; do
     url="$(printf '%s' "$raw" | sed 's/#.*//; s/[[:space:]]//g')"
     [ -n "$url" ] && add_adlist "$url" "family: NSFW (homelab-hive pi-hole kit)"
   done < "$FAMILY_LIST"
 else
-  echo "  ! $FAMILY_LIST not found — skipping NSFW file."
+  echo "  ! $FAMILY_LIST not found - skipping NSFW file."
 fi
 
 if [ "$FAMILY_BLOCK_GAMBLING" = "true" ]; then
-  echo "› Adding gambling / betting blocklist..."
+  echo "> Adding gambling / betting blocklist..."
   add_adlist "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/gambling.txt" \
              "family: gambling (homelab-hive pi-hole kit)"
 fi
 
 if [ "$BLOCK_DNS_BYPASS" = "true" ]; then
-  echo "› Blocking DNS-bypass tools (VPN / DoH / proxy)..."
+  echo "> Blocking DNS-bypass tools (VPN / DoH / proxy)..."
   echo "  ! Note: this can also block a legitimate VPN you use. Disable BLOCK_DNS_BYPASS if that's a problem."
   add_adlist "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/doh-vpn-proxy-bypass.txt" \
              "family: DNS-bypass block (homelab-hive pi-hole kit)"
@@ -132,13 +132,13 @@ fi
 # ---------------------------------------------------------------------------
 # Rebuild + restart
 # ---------------------------------------------------------------------------
-echo "› Rebuilding the block database (gravity)..."
+echo "> Rebuilding the block database (gravity)..."
 pihole -g
-echo "› Restarting DNS..."
+echo "> Restarting DNS..."
 pihole restartdns >/dev/null 2>&1 || systemctl restart pihole-FTL || true
 
 echo
 echo "✔ Family protection is on: SafeSearch forced, YouTube restricted, adult sites blocked."
-echo "  Test it: on a device using the Pi, search an adult term on Google — it should return safe results,"
+echo "  Test it: on a device using the Pi, search an adult term on Google - it should return safe results,"
 echo "  and known adult sites should not open."
 echo "  Reminder: pair this with device parental controls; no DNS filter is 100%."

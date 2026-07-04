@@ -1,8 +1,8 @@
-# 🧩 Layer 2 — HaramBlur (content blurring on the page)
+# Layer 2 - HaramBlur (content blurring on the page)
 
 Pi-hole is a **network** filter: it blocks bad *domains* and forces SafeSearch for
 every device, but it cannot look *inside* a page it allows. **HaramBlur** is the
-second layer that covers that gap — a free, open-source browser extension that uses
+second layer that covers that gap - a free, open-source browser extension that uses
 **on-device AI** to automatically **blur inappropriate images and videos on the page
 itself**, in real time.
 
@@ -32,20 +32,20 @@ Install it in **each family member's browser**:
   <https://addons.mozilla.org/addon/haramblur/>
 
 After installing, open the extension's pop-up and set:
-- **Detection type** — images/video, faces, NSFW.
-- **Blur strength** and **strictness** — start moderate; raise for younger kids.
-- **Hover-to-unblur** — consider turning this **off** on children's devices.
-- **On/off toggle** — leave it on.
+- **Detection type** - images/video, faces, NSFW.
+- **Blur strength** and **strictness** - start moderate; raise for younger kids.
+- **Hover-to-unblur** - consider turning this **off** on children's devices.
+- **On/off toggle** - leave it on.
 
 ## Good to know (honest notes)
 
-- **Per-device, per-browser.** Unlike Pi-hole, it isn't network-wide — you install it
+- **Per-device, per-browser.** Unlike Pi-hole, it isn't network-wide - you install it
   on each device/browser, and it only protects the browser (not native apps or games).
-- **Runs on the device.** All processing is in the browser (private — nothing uploaded),
+- **Runs on the device.** All processing is in the browser (private - nothing uploaded),
   but the AI uses CPU/GPU, so it can slow older phones/laptops. Lower the strictness or
   pause it on weak devices.
 - **Not foolproof.** AI detection misses things and occasionally over-blurs. It's a strong
-  aid, not a guarantee — keep it paired with Pi-hole, device parental controls, and
+  aid, not a guarantee - keep it paired with Pi-hole, device parental controls, and
   conversations.
 - **Managed devices:** for family/managed devices you can force-install the extension via
   your browser's enterprise policy (advanced; see the browser's extension-management docs).
