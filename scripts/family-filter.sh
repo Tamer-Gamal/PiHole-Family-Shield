@@ -110,7 +110,7 @@ echo "> Adding adult / NSFW blocklists..."
 if [ -f "$FAMILY_LIST" ]; then
   while IFS= read -r raw || [ -n "$raw" ]; do
     url="$(printf '%s' "$raw" | sed 's/#.*//; s/[[:space:]]//g')"
-    [ -n "$url" ] && add_adlist "$url" "family: NSFW (homelab-hive pi-hole kit)"
+    [ -n "$url" ] && add_adlist "$url" "family: NSFW (pi-hole family kit)"
   done < "$FAMILY_LIST"
 else
   echo "  ! $FAMILY_LIST not found - skipping NSFW file."
@@ -119,14 +119,14 @@ fi
 if [ "$FAMILY_BLOCK_GAMBLING" = "true" ]; then
   echo "> Adding gambling / betting blocklist..."
   add_adlist "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/gambling.txt" \
-             "family: gambling (homelab-hive pi-hole kit)"
+             "family: gambling (pi-hole family kit)"
 fi
 
 if [ "$BLOCK_DNS_BYPASS" = "true" ]; then
   echo "> Blocking DNS-bypass tools (VPN / DoH / proxy)..."
   echo "  ! Note: this can also block a legitimate VPN you use. Disable BLOCK_DNS_BYPASS if that's a problem."
   add_adlist "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/doh-vpn-proxy-bypass.txt" \
-             "family: DNS-bypass block (homelab-hive pi-hole kit)"
+             "family: DNS-bypass block (pi-hole family kit)"
 fi
 
 # ---------------------------------------------------------------------------

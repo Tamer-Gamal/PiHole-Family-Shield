@@ -17,6 +17,10 @@ Family protection is the **main purpose** and is **on by default**:
 - **Blocks gambling** and known **scam / phishing / malware** domains
 - **Blocks ads & trackers** (faster, cleaner browsing as a bonus)
 
+Plus an **optional second layer**: the **[HaramBlur](https://github.com/alganzory/HaramBlur)** browser add-on
+blurs inappropriate images and videos on the page itself, covering what DNS filtering can't see inside allowed
+sites (see **Layer 2** below).
+
 > **No DNS filter is perfect.** It blocks known bad *domains* and forces safe search,
 > but can't see inside an allowed site, can't catch brand-new adult sites instantly, and
 > can be bypassed with a VPN unless hardened. Use it **with** device parental controls
@@ -24,9 +28,6 @@ Family protection is the **main purpose** and is **on by default**:
 
 Built to be **cloned**: edit one config file, run one script, and you have an
 identical, family-safe Pi-hole. Make one for yourself, then make more for friends.
-
-> This is a standalone Homelab-Hive project. It has **nothing to do with the Rei
-> VM** or any Rei service - it runs entirely on its own Raspberry Pi hardware.
 
 ---
 

@@ -32,7 +32,7 @@ while IFS= read -r raw || [ -n "$raw" ]; do
     skipped=$((skipped+1))
   else
     sqlite3 "$GRAVITY_DB" \
-      "INSERT INTO adlist (address, enabled, comment) VALUES ('$url', 1, 'curated: homelab-hive pi-hole kit');"
+      "INSERT INTO adlist (address, enabled, comment) VALUES ('$url', 1, 'curated: pi-hole family kit');"
     echo "  + added: $url"
     added=$((added+1))
   fi
