@@ -36,7 +36,7 @@ Open the **interactive guidebook** — it walks you through everything with
 diagrams, checklists, and copy-paste commands:
 
 ```
-guide/index.html      ← double-click to open in your browser
+pi-hole/guide/index.html      ← double-click to open in your browser
 ```
 
 Order of the journey:
@@ -51,7 +51,7 @@ Order of the journey:
 ## 🧰 What's in this folder
 
 ```
-pihole-family-shield/
+pi-hole/
 ├── README.md                     ← you are here
 ├── guide/
 │   └── index.html                ← the interactive, illustrated guidebook
@@ -64,23 +64,28 @@ pihole-family-shield/
 │   ├── add-blocklists.sh         ← adds the curated ad/malware blocklists
 │   ├── backup.sh                 ← save your config (Teleporter) to reuse on other Pis
 │   └── update.sh                 ← keep OS + Pi-hole + lists up to date
-└── config/
-    ├── blocklists.txt            ← curated ad + malware/phishing lists
-    ├── blocklists-family.txt     ← adult / NSFW lists (family mode)
-    └── unbound-pihole.conf       ← Unbound resolver config
+├── config/
+│   ├── blocklists.txt            ← curated ad + malware/phishing lists
+│   ├── blocklists-family.txt     ← adult / NSFW lists (family mode)
+│   └── unbound-pihole.conf       ← Unbound resolver config
+└── companions/
+    └── haramblur.md              ← Layer 2: on-page image/video blurring (browser add-on)
 ```
 
 ---
 
 ## ⚡ Quick start (for people comfortable in a terminal)
 
-On a freshly-flashed Raspberry Pi OS Lite (connected to your network), download this
-kit and run the installer:
+The kit is **self-contained** — it does **not** need access to any private repo. Get the
+`pi-hole/` folder onto a freshly-flashed Raspberry Pi OS Lite (connected to your network),
+then run the installer.
 
 ```bash
-sudo apt-get update && sudo apt-get install -y git
-git clone https://github.com/Tamer-Gamal/pihole-family-shield.git
-cd pihole-family-shield/scripts
+# On your computer, in the folder that contains pi-hole/ :
+scp -r ./pi-hole pi@pihole.local:~/
+
+# Then on the Pi:
+cd ~/pi-hole/scripts
 cp setup.conf.example setup.conf
 nano setup.conf              # set your admin password (family mode is on by default)
 sudo ./bootstrap.sh
@@ -89,8 +94,8 @@ sudo ./bootstrap.sh
 Then set your **router's DNS server** to the Pi's IP address and reboot your
 devices. Done.
 
-> No internet on the Pi yet? Copy this folder over with a USB stick or
-> `scp -r . pi@pihole.local:~/pihole-family-shield` instead, then run the same steps.
+> Other ways to move the folder: a USB stick, a cloud link, or `git clone` if you keep
+> the kit in a repo the target can read. See **Sharing with friends** below.
 
 ---
 
@@ -104,7 +109,10 @@ devices. Done.
   cd pihole-family-shield/scripts && cp setup.conf.example setup.conf && nano setup.conf && sudo ./bootstrap.sh
   ```
 - **USB stick / cloud link** — hand them the `pi-hole/` folder; they copy it onto their Pi.
-- **`scp` / USB** — copy this whole folder to the Pi, then run the steps in the Quick start.
+- **`scp`** — if you set their Pi up, `scp -r ./pi-hole pi@pihole.local:~/` from your computer.
+
+> This `pi-hole/` folder inside the private homelab repo is the **source**; the public repo above
+> is a mirror of it. When you change the kit here, re-push the same files to the public repo.
 
 **Reproducing the Pi-hole itself**, two ways:
 
@@ -132,6 +140,17 @@ search. It **cannot** filter content *inside* a site you allow, **cannot** catch
 brand-new adult site until the lists update, and a determined child can bypass it with a
 VPN unless you enable `BLOCK_DNS_BYPASS` **and** force all devices' DNS to the Pi in your
 router. Use this **with** device parental controls and conversations — not instead of them.
+
+### 🧩 Layer 2 — HaramBlur (blurs what Pi-hole can't see inside)
+
+Pair this network filter with **[HaramBlur](https://github.com/alganzory/HaramBlur)** — a
+free, open-source browser extension (AGPL-3.0) that uses **on-device AI** to blur
+inappropriate **images & videos on the page itself**, covering Pi-hole's blind spot inside
+allowed sites. It's a **separate project** (not part of this kit); install it per browser:
+- Chrome/Edge/Brave: <https://chrome.google.com/webstore/detail/haramblur/pbcoegikffnadpahojjhgdladmmddeji>
+- Firefox (desktop & Android): <https://addons.mozilla.org/addon/haramblur/>
+
+Full setup, settings, caveats & lock-down tips: **[`companions/haramblur.md`](companions/haramblur.md)**.
 
 ---
 
@@ -166,8 +185,12 @@ This kit is a **wrapper + guide**, not a fork. The actual software it installs:
   maintained release — we deliberately do **not** vendor Pi-hole's source here.
 - **Unbound** — recursive DNS resolver (NLnet Labs), installed from the OS package repo.
 - **Blocklists** — maintained by their authors: OISD, HaGeZi, Steven Black, and others.
+- **HaramBlur** (optional Layer 2, install per browser) — on-device-AI image/video blurring
+  browser extension by *alganzory*: <https://github.com/alganzory/HaramBlur> (AGPL-3.0). A
+  separate project, not bundled with, modified by, or affiliated with this kit.
 
-This project is independent and **not affiliated with or endorsed by** the Pi-hole team.
+This project is independent and **not affiliated with or endorsed by** the Pi-hole team
+or the HaramBlur project.
 
 ## ⚠️ Verification note
 

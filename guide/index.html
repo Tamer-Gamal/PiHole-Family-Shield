@@ -343,10 +343,33 @@
             are blocked too — protecting wallets as well as eyes.</p></div>
       </div>
       <div class="callout warn"><b>Please read — no filter is perfect.</b> DNS filtering blocks known bad
-        <i>websites</i> and forces safe search, but it <b>cannot</b> see inside a site you allow, <b>cannot</b> catch
-        a brand-new adult site until the lists update, and a determined, tech-savvy child can bypass it with a VPN.
-        Treat this as a strong <i>first</i> layer — use it <b>together with</b> device parental controls
-        (Apple Screen Time, Google Family Link) and honest conversations. It is not a substitute for supervision.</div>
+        <i>websites</i> and forces safe search, but it <b>cannot</b> see inside a site you allow (that’s what
+        <b>Layer 2 · HaramBlur</b> below is for), <b>cannot</b> catch a brand-new adult site until the lists update,
+        and a determined, tech-savvy child can bypass it with a VPN. Treat this as a strong <i>first</i> layer — use it
+        <b>together with</b> device parental controls (Apple Screen Time, Google Family Link) and honest conversations.
+        It is not a substitute for supervision.</div>
+
+      <h3 style="margin:30px 0 4px">🧩 Layer 2 · HaramBlur — blur what Pi-hole can’t see inside</h3>
+      <p class="prose">Pi-hole guards the <b>network</b>, so it can’t reach <i>inside</i> a page it allows.
+        <b>HaramBlur</b> closes that gap: a free, open-source browser add-on that uses <b>on-device AI</b> to
+        automatically <b>blur inappropriate images &amp; videos right on the page</b> — the perfect companion to Pi-hole.
+        Install it in each family member’s browser.</p>
+      <div class="grid2">
+        <div class="card"><h3>Install (per browser)</h3>
+          <p style="color:var(--muted)"><a href="https://chrome.google.com/webstore/detail/haramblur/pbcoegikffnadpahojjhgdladmmddeji" target="_blank" rel="noopener"><b>Chrome / Edge / Brave</b></a>
+            &nbsp;·&nbsp; <a href="https://addons.mozilla.org/addon/haramblur/" target="_blank" rel="noopener"><b>Firefox</b></a>
+            (also Firefox for Android). Then set the blur strength &amp; strictness in its pop-up.</p></div>
+        <div class="card"><h3>Private &amp; on-device</h3>
+          <p style="color:var(--muted)">All detection runs <b>in the browser</b> — it doesn’t send your browsing
+            anywhere. Open-source (AGPL-3.0). Because the AI runs on the device, it can use noticeable CPU on older
+            phones/laptops — lower the strictness or pause it if a device struggles.</p></div>
+      </div>
+      <div class="callout safe"><b>Two layers, one goal.</b> Pi-hole stops bad <i>sites</i> for every device on the
+        network; HaramBlur blurs bad <i>images</i> on the sites that remain. Together they cover far more than either
+        alone. HaramBlur is a separate project
+        (<a href="https://github.com/alganzory/HaramBlur" target="_blank" rel="noopener">github.com/alganzory/HaramBlur</a>),
+        not part of this kit — install it per browser; it needs no Pi-hole changes.</div>
+
       <details><summary>Make it harder to bypass (optional, for older kids)</summary>
         <div class="body"><p>In <code>setup.conf</code> set <code>BLOCK_DNS_BYPASS="true"</code> to also block the
           VPN / “private DNS” tricks kids use to escape the filter — then, in your router, force <b>all</b> devices to
