@@ -1,0 +1,26 @@
+# ============================================================================
+#  Curated Pi-hole blocklists ("adlists")
+# ----------------------------------------------------------------------------
+#  add-blocklists.sh reads this file and adds each URL to Pi-hole, ON TOP of
+#  Pi-hole's built-in default list (StevenBlack unified hosts).
+#
+#  One URL per line. Lines starting with #  are comments and are ignored.
+#  These are chosen to block ads + malware/phishing WITHOUT breaking normal
+#  sites for non-technical users (low "false positive" lists).
+#
+#  If a website ever misbehaves, you do NOT need to edit this file — just
+#  "whitelist" the domain in the admin page (Domains → Add to allowlist), or
+#  remove one list here and run ../scripts/add-blocklists.sh again.
+# ============================================================================
+
+# --- Ads + tracking: the all-in-one workhorse (very low false positives) ----
+https://big.oisd.nl
+
+# --- Malware / viruses / trojan callbacks -----------------------------------
+https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt
+
+# --- Phishing / scam / fake-login sites -------------------------------------
+https://phishing.army/download/phishing_army_blocklist_extended.txt
+
+# --- Cryptojacking / malicious ad networks ----------------------------------
+https://v.firebog.net/hosts/Prigent-Crypto.txt

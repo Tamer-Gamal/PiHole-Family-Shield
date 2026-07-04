@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi-hole — Home Shield Setup Guide</title>
+<style>
+  /* ---- tokens ---------------------------------------------------------- */
+  :root{
+    --ground:#0E1420; --raised:#161E2E; --raised-2:#1D2739; --hair:#26314A;
+    --ink:#E8ECF4; --muted:#93A0B8; --faint:#66748f;
+    --safe:#2ED4A7; --safe-dim:#1c8f72; --blocked:#FF6B6B; --amber:#FFC15E;
+    --shadow:0 10px 40px rgba(0,0,0,.35);
+    --radius:16px; --radius-sm:10px;
+    --measure:66ch;
+    --mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+    --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  }
+  html[data-theme="light"]{
+    --ground:#F5F7FB; --raised:#FFFFFF; --raised-2:#EEF2F8; --hair:#D8E0EC;
+    --ink:#16202F; --muted:#54627A; --faint:#8593aa;
+    --safe:#0E9E77; --safe-dim:#0b7d5e; --blocked:#E0463F; --amber:#B8791A;
+    --shadow:0 10px 30px rgba(30,50,90,.12);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:18px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+  a{color:var(--safe)}
+  h1,h2,h3{text-wrap:balance; line-height:1.12; margin:0}
+  code,kbd{font-family:var(--mono)}
+  .eyebrow{font-size:.74rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--muted); font-weight:700}
+
+  /* ---- top bar / progress --------------------------------------------- */
+  .topbar{position:sticky; top:0; z-index:50; background:color-mix(in srgb,var(--ground) 88%, transparent);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--hair)}
+  .topbar .row{display:flex; align-items:center; gap:16px; padding:12px 0}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.01em}
+  .brand .dot{width:26px;height:26px;flex:0 0 26px}
+  .topbar .spacer{flex:1}
+  .pmeter{display:flex; align-items:center; gap:10px; min-width:0}
+  .pbar{width:160px;height:8px;background:var(--raised-2);border-radius:99px;overflow:hidden;
+    border:1px solid var(--hair)}
+  .pbar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--safe-dim),var(--safe));
+    transition:width .5s ease}
+  .pct{font-variant-numeric:tabular-nums; font-weight:700; font-size:.9rem; color:var(--muted)}
+  .tbtn{appearance:none;border:1px solid var(--hair);background:var(--raised);color:var(--ink);
+    border-radius:99px;padding:7px 12px;font:inherit;font-size:.85rem;cursor:pointer}
+  .tbtn:hover{border-color:var(--safe)}
+  .tbtn:focus-visible,a:focus-visible,.copy:focus-visible,summary:focus-visible,.chk:focus-within{
+    outline:2px solid var(--safe); outline-offset:2px}
+
+  /* ---- hero ------------------------------------------------------------ */
+  .hero{padding:64px 0 40px; display:grid; grid-template-columns:1.05fr .95fr; gap:44px; align-items:center}
+  .hero h1{font-size:clamp(2.3rem,5vw,3.6rem); font-weight:800; letter-spacing:-.02em}
+  .hero .lede{font-size:1.2rem; color:var(--muted); margin:18px 0 0; max-width:52ch}
+  .hero .tags{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
+  .tag{border:1px solid var(--hair); background:var(--raised); color:var(--muted);
+    border-radius:99px; padding:6px 14px; font-size:.86rem; font-weight:600}
+  .tag b{color:var(--ink)}
+  .heroart{background:var(--raised); border:1px solid var(--hair); border-radius:var(--radius);
+    padding:22px; box-shadow:var(--shadow)}
+
+  /* ---- layout: rail + content ----------------------------------------- */
+  .layout{display:grid; grid-template-columns:230px 1fr; gap:48px; padding:20px 0 80px; align-items:start}
+  .rail{position:sticky; top:78px; align-self:start}
+  .rail ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px}
+  .rail a{display:flex; align-items:center; gap:12px; padding:9px 10px; border-radius:10px;
+    color:var(--muted); text-decoration:none; font-size:.95rem; font-weight:600}
+  .rail a:hover{background:var(--raised); color:var(--ink)}
+  .rail a.active{background:var(--raised); color:var(--ink)}
+  .rail a .n{width:26px;height:26px;flex:0 0 26px;border-radius:8px;border:1px solid var(--hair);
+    display:grid;place-items:center;font-size:.82rem;font-weight:800;color:var(--faint);
+    background:var(--ground); font-variant-numeric:tabular-nums}
+  .rail a.done .n{background:var(--safe); border-color:var(--safe); color:#04160f}
+  .rail a.active .n{border-color:var(--safe); color:var(--safe)}
+  .rail a.done.active .n{color:#04160f}
+
+  /* ---- sections / cards ----------------------------------------------- */
+  section.step{scroll-margin-top:80px; padding:26px 0 10px; border-top:1px solid var(--hair); margin-top:38px}
+  section.step:first-of-type{border-top:0; margin-top:0}
+  .step h2{font-size:1.9rem; font-weight:800; letter-spacing:-.01em; margin:6px 0 0;
+    display:flex; align-items:baseline; gap:14px}
+  .step h2 .num{color:var(--safe); font-size:1.15rem; font-weight:800; font-variant-numeric:tabular-nums}
+  .prose{max-width:var(--measure)}
+  .prose p{margin:16px 0}
+  .card{background:var(--raised); border:1px solid var(--hair); border-radius:var(--radius);
+    padding:22px 24px; margin:20px 0; box-shadow:var(--shadow)}
+  .card h3{font-size:1.15rem; margin-bottom:6px}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+
+  /* ---- command block --------------------------------------------------- */
+  .cmd{position:relative; background:#0a0f18; border:1px solid var(--hair); border-radius:var(--radius-sm);
+    margin:14px 0; overflow:hidden}
+  html[data-theme="light"] .cmd{background:#0d1626}
+  .cmd pre{margin:0; padding:16px 56px 16px 18px; overflow-x:auto; color:#dfe7f2}
+  .cmd pre code{font-size:.92rem; line-height:1.6; white-space:pre}
+  .cmd .prompt{color:var(--safe); user-select:none}
+  .cmd .cmt{color:#6f7f97}
+  .copy{position:absolute; top:8px; right:8px; appearance:none; cursor:pointer;
+    background:var(--raised-2); color:var(--ink); border:1px solid var(--hair);
+    border-radius:8px; padding:6px 10px; font:inherit; font-size:.78rem; font-weight:700}
+  .copy:hover{border-color:var(--safe); color:var(--safe)}
+  .copy.done{background:var(--safe); color:#04160f; border-color:var(--safe)}
+
+  /* ---- checklists ------------------------------------------------------ */
+  .checks{list-style:none; margin:16px 0; padding:0; display:flex; flex-direction:column; gap:10px}
+  .chk{display:flex; gap:13px; align-items:flex-start; background:var(--raised); border:1px solid var(--hair);
+    border-radius:var(--radius-sm); padding:13px 15px; cursor:pointer}
+  .chk input{appearance:none; margin:2px 0 0; width:22px; height:22px; flex:0 0 22px; cursor:pointer;
+    border:2px solid var(--faint); border-radius:6px; background:var(--ground); position:relative}
+  .chk input:checked{background:var(--safe); border-color:var(--safe)}
+  .chk input:checked::after{content:"✓"; position:absolute; inset:0; display:grid; place-items:center;
+    color:#04160f; font-size:14px; font-weight:900}
+  .chk .t{flex:1}
+  .chk .t b{font-weight:700}
+  .chk input:checked ~ .t{color:var(--muted)}
+  .chk input:checked ~ .t b{text-decoration:line-through; text-decoration-color:var(--safe-dim)}
+
+  /* ---- callouts -------------------------------------------------------- */
+  .callout{border-radius:var(--radius-sm); padding:14px 16px 14px 46px; margin:16px 0; position:relative;
+    border:1px solid var(--hair); background:var(--raised)}
+  .callout::before{position:absolute; left:15px; top:13px; font-size:1.05rem}
+  .callout.tip::before{content:"💡"} .callout.warn::before{content:"⚠️"} .callout.safe::before{content:"✅"}
+  .callout.warn{border-color:color-mix(in srgb,var(--amber) 45%,var(--hair))}
+  .callout.safe{border-color:color-mix(in srgb,var(--safe) 45%,var(--hair))}
+  .callout b{color:var(--ink)}
+
+  /* ---- diagrams -------------------------------------------------------- */
+  .figure{background:var(--raised); border:1px solid var(--hair); border-radius:var(--radius);
+    padding:18px; margin:22px 0; box-shadow:var(--shadow)}
+  .figure svg{width:100%; height:auto; display:block}
+  .figure figcaption{color:var(--muted); font-size:.9rem; margin-top:12px; text-align:center}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin:0 4px 0 10px}
+
+  /* ---- collapsibles ---------------------------------------------------- */
+  details{background:var(--raised); border:1px solid var(--hair); border-radius:var(--radius-sm);
+    margin:12px 0; overflow:hidden}
+  summary{cursor:pointer; padding:14px 16px; font-weight:700; list-style:none; display:flex; gap:10px; align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+"; color:var(--safe); font-weight:900; font-size:1.2rem; width:16px}
+  details[open] summary::before{content:"–"}
+  details .body{padding:0 16px 16px 42px; color:var(--muted); max-width:var(--measure)}
+  details .body p{margin:8px 0}
+
+  /* ---- footer ---------------------------------------------------------- */
+  footer{border-top:1px solid var(--hair); padding:34px 0 60px; color:var(--muted); font-size:.92rem}
+  .kbd{font-family:var(--mono); background:var(--raised-2); border:1px solid var(--hair);
+    border-radius:6px; padding:1px 7px; font-size:.85em}
+
+  /* ---- responsive ------------------------------------------------------ */
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr; gap:28px; padding:40px 0 20px}
+    .layout{grid-template-columns:1fr; gap:0}
+    .rail{position:static; margin-bottom:20px}
+    .rail ol{flex-direction:row; flex-wrap:wrap; gap:8px}
+    .rail a{padding:7px 10px}
+    .grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================ TOP BAR ============================ -->
+<div class="topbar">
+  <div class="wrap row">
+    <span class="brand">
+      <svg class="dot" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2l11 4v8c0 7-4.7 12.5-11 16C9.7 26.5 5 21 5 14V6z" fill="none" stroke="var(--safe)" stroke-width="2"/><path d="M11 16l3.4 3.4L21 12.8" fill="none" stroke="var(--safe)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Home Shield <span style="color:var(--muted);font-weight:600">· Pi-hole</span>
+    </span>
+    <span class="spacer"></span>
+    <span class="pmeter" title="Your progress (saved on this device)">
+      <span class="pbar"><i id="pfill"></i></span>
+      <span class="pct" id="ppct">0%</span>
+    </span>
+    <button class="tbtn" id="themeBtn" type="button" aria-label="Switch light or dark">🌙 Dark</button>
+  </div>
+</div>
+
+<!-- ============================ HERO ============================ -->
+<header class="wrap hero">
+  <div>
+    <span class="eyebrow">Homelab · a family-safety project anyone can do</span>
+    <h1>Protect your kids — and block ads — across your <span style="color:var(--safe)">whole home</span>.</h1>
+    <p class="lede">Pi-hole is a tiny guard that sits between your family’s devices and the internet. It forces
+      <b>SafeSearch</b>, restricts <b>YouTube</b>, and blocks <b>adult</b>, scam, malware, and ad/tracker sites
+      for <b>every</b> phone, laptop, TV, and console on your Wi-Fi — with nothing to install on each one.</p>
+    <div class="tags">
+      <span class="tag">👨‍👩‍👧 <b>Family-first</b></span>
+      <span class="tag">⏱️ <b>~45 min</b></span>
+      <span class="tag">🧠 <b>No coding</b></span>
+      <span class="tag">🔁 <b>Repeatable for friends</b></span>
+    </div>
+    <p style="margin-top:20px; font-size:.92rem; color:var(--muted)">Built on <a href="https://pi-hole.net" target="_blank" rel="noopener"><b>Pi-hole®</b></a> — the free,
+      open-source network blocker (<a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">source on GitHub</a>).
+      This kit installs it from the official installer and adds family filtering, setup scripts &amp; this guide on top.</p>
+  </div>
+  <div class="heroart">
+    <!-- before / after -->
+    <svg viewBox="0 0 460 300" role="img" aria-label="Before: a web page full of ads. After: the same page, clean.">
+      <defs>
+        <clipPath id="scr"><rect x="0" y="0" width="200" height="150" rx="8"/></clipPath>
+      </defs>
+      <!-- BEFORE -->
+      <g transform="translate(14,40)">
+        <text x="100" y="-14" fill="var(--muted)" font-size="13" text-anchor="middle" font-family="var(--sans)">WITHOUT Pi-hole</text>
+        <rect x="0" y="0" width="200" height="150" rx="10" fill="var(--ground)" stroke="var(--hair)"/>
+        <g clip-path="url(#scr)">
+          <rect x="10" y="12" width="120" height="9" rx="3" fill="var(--faint)"/>
+          <rect x="10" y="28" width="180" height="7" rx="3" fill="#2a3448"/>
+          <rect x="10" y="40" width="150" height="7" rx="3" fill="#2a3448"/>
+          <rect x="10" y="58" width="180" height="34" rx="4" fill="#3a1f24" stroke="var(--blocked)"/>
+          <text x="100" y="79" fill="var(--blocked)" font-size="12" text-anchor="middle" font-weight="700">AD</text>
+          <rect x="10" y="100" width="86" height="40" rx="4" fill="#3a1f24" stroke="var(--blocked)"/>
+          <text x="53" y="124" fill="var(--blocked)" font-size="11" text-anchor="middle" font-weight="700">AD</text>
+          <rect x="104" y="100" width="86" height="18" rx="3" fill="#2a3448"/>
+          <rect x="104" y="124" width="60" height="16" rx="3" fill="#3a1f24" stroke="var(--blocked)"/>
+        </g>
+      </g>
+      <!-- arrow / shield -->
+      <g transform="translate(214,96)">
+        <path d="M16 0l16 6v14c0 11-7 20-16 24C7 40 0 31 0 20V6z" fill="none" stroke="var(--safe)" stroke-width="2.4" transform="translate(2,0)"/>
+        <path d="M11 22l5 5 9-11" fill="none" stroke="var(--safe)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(2,0)"/>
+      </g>
+      <!-- AFTER -->
+      <g transform="translate(246,40)">
+        <text x="100" y="-14" fill="var(--safe)" font-size="13" text-anchor="middle" font-family="var(--sans)" font-weight="700">WITH Pi-hole</text>
+        <rect x="0" y="0" width="200" height="150" rx="10" fill="var(--ground)" stroke="color-mix(in srgb,var(--safe) 50%,var(--hair))"/>
+        <rect x="10" y="12" width="120" height="9" rx="3" fill="var(--faint)"/>
+        <rect x="10" y="28" width="180" height="7" rx="3" fill="#2a3448"/>
+        <rect x="10" y="40" width="150" height="7" rx="3" fill="#2a3448"/>
+        <rect x="10" y="58" width="180" height="7" rx="3" fill="#2a3448"/>
+        <rect x="10" y="70" width="164" height="7" rx="3" fill="#2a3448"/>
+        <rect x="10" y="86" width="180" height="7" rx="3" fill="#2a3448"/>
+        <rect x="10" y="98" width="120" height="7" rx="3" fill="#2a3448"/>
+        <g transform="translate(150,112)"><circle r="15" fill="none" stroke="var(--safe)" stroke-width="2"/><path d="M-6 0l4 4 8-9" fill="none" stroke="var(--safe)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+      </g>
+    </svg>
+    <p style="color:var(--muted);font-size:.86rem;margin:12px 4px 0;text-align:center">
+      Same page. <span style="color:var(--blocked);font-weight:700">Ads blocked</span> before they ever load — so pages are faster too.</p>
+  </div>
+</header>
+
+<!-- ============================ LAYOUT ============================ -->
+<div class="wrap layout">
+
+  <!-- STEP RAIL -->
+  <nav class="rail" aria-label="Steps">
+    <ol id="railList">
+      <li><a href="#s-how" data-step="how"><span class="n">i</span> How it works</a></li>
+      <li><a href="#s-family" data-step="family"><span class="n">♥</span> Family safety</a></li>
+      <li><a href="#s-need" data-step="need"><span class="n">1</span> What you need</a></li>
+      <li><a href="#s-flash" data-step="flash"><span class="n">2</span> Flash the card</a></li>
+      <li><a href="#s-connect" data-step="connect"><span class="n">3</span> Connect</a></li>
+      <li><a href="#s-install" data-step="install"><span class="n">4</span> Install</a></li>
+      <li><a href="#s-router" data-step="router"><span class="n">5</span> Point network</a></li>
+      <li><a href="#s-verify" data-step="verify"><span class="n">6</span> Verify</a></li>
+      <li><a href="#s-friends" data-step="friends"><span class="n">★</span> Share</a></li>
+    </ol>
+  </nav>
+
+  <!-- CONTENT -->
+  <main>
+
+    <!-- HOW IT WORKS -->
+    <section class="step" id="s-how" data-step="how">
+      <span class="eyebrow">The idea</span>
+      <h2><span class="num">i.</span> How a little box blocks ads everywhere</h2>
+      <div class="prose">
+        <p>Every time a device opens a website, it first asks a <b>phone book of the internet</b> — called
+          <b>DNS</b> — “what’s the address for this name?”. Ads and trackers come from their own names
+          (like <code>ads.example.com</code>). Pi-hole becomes your home’s phone book, and simply
+          <b>refuses to look up the bad names</b>. If the address is never found, the ad never loads.</p>
+      </div>
+      <figure class="figure">
+        <svg viewBox="0 0 720 220" role="img" aria-label="A device asks Pi-hole for an address. Good names are answered and load; ad and malware names are blocked.">
+          <!-- device -->
+          <g transform="translate(20,80)">
+            <rect x="0" y="0" width="90" height="60" rx="10" fill="var(--raised-2)" stroke="var(--hair)"/>
+            <text x="45" y="35" text-anchor="middle" fill="var(--ink)" font-size="13" font-family="var(--sans)">Your phone</text>
+          </g>
+          <!-- arrow to pihole -->
+          <line x1="112" y1="110" x2="250" y2="110" stroke="var(--faint)" stroke-width="2" marker-end="url(#ar)"/>
+          <text x="181" y="100" text-anchor="middle" fill="var(--muted)" font-size="11">“address for…?”</text>
+          <!-- pihole shield -->
+          <g transform="translate(258,58)">
+            <rect x="0" y="0" width="150" height="104" rx="14" fill="var(--raised)" stroke="var(--safe)"/>
+            <path d="M75 14l20 7v16c0 12-8 22-20 27-12-5-20-15-20-27V21z" fill="none" stroke="var(--safe)" stroke-width="2"/>
+            <path d="M67 55l6 6 12-14" fill="none" stroke="var(--safe)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="75" y="96" text-anchor="middle" fill="var(--ink)" font-size="12" font-weight="700">Pi-hole</text>
+          </g>
+          <!-- good path -->
+          <line x1="410" y1="88" x2="560" y2="52" stroke="var(--safe)" stroke-width="2.4" marker-end="url(#arg)"/>
+          <g transform="translate(566,26)">
+            <rect x="0" y="0" width="132" height="52" rx="10" fill="color-mix(in srgb,var(--safe) 12%,var(--raised))" stroke="var(--safe)"/>
+            <text x="66" y="22" text-anchor="middle" fill="var(--safe)" font-size="12" font-weight="700">good site</text>
+            <text x="66" y="39" text-anchor="middle" fill="var(--muted)" font-size="11">loads normally ✓</text>
+          </g>
+          <!-- blocked path -->
+          <line x1="410" y1="132" x2="560" y2="168" stroke="var(--blocked)" stroke-width="2.4" stroke-dasharray="6 5"/>
+          <g transform="translate(566,142)">
+            <rect x="0" y="0" width="132" height="52" rx="10" fill="color-mix(in srgb,var(--blocked) 12%,var(--raised))" stroke="var(--blocked)"/>
+            <text x="66" y="22" text-anchor="middle" fill="var(--blocked)" font-size="12" font-weight="700">ad / tracker</text>
+            <text x="66" y="39" text-anchor="middle" fill="var(--muted)" font-size="11">blocked ✕</text>
+          </g>
+          <defs>
+            <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0l9 4.5L0 9z" fill="var(--faint)"/></marker>
+            <marker id="arg" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0l9 4.5L0 9z" fill="var(--safe)"/></marker>
+          </defs>
+        </svg>
+        <figcaption>Pi-hole answers the <span class="swatch" style="background:var(--safe)"></span>good names and drops the
+          <span class="swatch" style="background:var(--blocked)"></span>ad &amp; malware names.</figcaption>
+      </figure>
+      <div class="callout safe"><b>Why it protects the whole house:</b> because every device already uses DNS,
+        you only change it in <i>one</i> place — your router — and every gadget is covered at once.</div>
+    </section>
+
+    <!-- FAMILY SAFETY -->
+    <section class="step" id="s-family" data-step="family">
+      <span class="eyebrow">Family safety · the main reason to do this</span>
+      <h2><span class="num">♥</span> What your family is protected from</h2>
+      <p class="prose">This kit is built <b>for families first</b>. When you run the installer with family mode on
+        (it’s the default), the same DNS trick that blocks ads is used to keep the whole network kid-safer —
+        automatically, on every device.</p>
+      <div class="grid2">
+        <div class="card"><h3>🔍 SafeSearch, forced</h3>
+          <p style="color:var(--muted)">Google, Bing and DuckDuckGo are quietly locked into <b>SafeSearch</b>, so
+            adult results and images don’t show up — even if a child turns SafeSearch off in the browser.</p></div>
+        <div class="card"><h3>▶️ YouTube restricted</h3>
+          <p style="color:var(--muted)">YouTube is put into <b>Restricted Mode</b>, which hides mature videos and
+            comments across the network.</p></div>
+        <div class="card"><h3>🚫 Adult sites blocked</h3>
+          <p style="color:var(--muted)">Known <b>pornographic and adult</b> websites are blocked for every device,
+            using actively-maintained family blocklists.</p></div>
+        <div class="card"><h3>🎰 Gambling &amp; scams</h3>
+          <p style="color:var(--muted)">Gambling/betting sites and known <b>scam, phishing and malware</b> domains
+            are blocked too — protecting wallets as well as eyes.</p></div>
+      </div>
+      <div class="callout warn"><b>Please read — no filter is perfect.</b> DNS filtering blocks known bad
+        <i>websites</i> and forces safe search, but it <b>cannot</b> see inside a site you allow, <b>cannot</b> catch
+        a brand-new adult site until the lists update, and a determined, tech-savvy child can bypass it with a VPN.
+        Treat this as a strong <i>first</i> layer — use it <b>together with</b> device parental controls
+        (Apple Screen Time, Google Family Link) and honest conversations. It is not a substitute for supervision.</div>
+      <details><summary>Make it harder to bypass (optional, for older kids)</summary>
+        <div class="body"><p>In <code>setup.conf</code> set <code>BLOCK_DNS_BYPASS="true"</code> to also block the
+          VPN / “private DNS” tricks kids use to escape the filter — then, in your router, force <b>all</b> devices to
+          use only this Pi for DNS. Heads-up: this can also block a VPN <i>you</i> use for work, so turn it on only if
+          you understand that trade-off.</p></div></details>
+    </section>
+
+    <!-- WHAT YOU NEED -->
+    <section class="step" id="s-need" data-step="need">
+      <span class="eyebrow">Step 1</span>
+      <h2><span class="num">1.</span> Gather what you need</h2>
+      <p class="prose">Tick these off. Any recent Raspberry Pi works — a Pi 4 is the sweet spot, but a Pi 3,
+        Pi 5, or even a Pi Zero 2 W will happily block ads for a busy household.</p>
+      <ul class="checks" data-step="need">
+        <li class="chk"><input type="checkbox" data-key="need-pi"><span class="t"><b>A Raspberry Pi</b> — Pi 3 / 4 / 5 or Zero 2 W, with its power supply.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-sd"><span class="t"><b>A microSD card</b> — 8 GB or larger.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-reader"><span class="t"><b>An SD card reader</b> for your computer.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-net"><span class="t"><b>A network connection</b> for the Pi — an Ethernet cable is easiest; Wi-Fi also works.</span></li>
+        <li class="chk"><input type="checkbox" data-key="need-router"><span class="t"><b>Access to your router’s settings</b> — the sticker on it usually has the web address, username &amp; password.</span></li>
+      </ul>
+      <div class="callout tip"><b>Tip:</b> plug the Pi in with an Ethernet cable if you can. It’s more reliable
+        for an always-on box, and it skips the Wi-Fi setup entirely.</div>
+    </section>
+
+    <!-- FLASH -->
+    <section class="step" id="s-flash" data-step="flash">
+      <span class="eyebrow">Step 2</span>
+      <h2><span class="num">2.</span> Put the operating system on the card</h2>
+      <p class="prose">You’ll use the free, official <b>Raspberry Pi Imager</b> app to write “Raspberry Pi OS
+        Lite” onto the microSD card. “Lite” has no desktop — perfect for a box that just quietly runs.</p>
+      <ul class="checks" data-step="flash">
+        <li class="chk"><input type="checkbox" data-key="flash-imager"><span class="t">Install <b>Raspberry Pi Imager</b> from <a href="https://www.raspberrypi.com/software/" target="_blank" rel="noopener">raspberrypi.com/software</a>.</span></li>
+        <li class="chk"><input type="checkbox" data-key="flash-os"><span class="t">Choose OS → <b>Raspberry Pi OS Lite (64-bit)</b>. Choose your microSD as the storage.</span></li>
+        <li class="chk"><input type="checkbox" data-key="flash-edit"><span class="t">Click <b>Edit Settings</b> and set: hostname <code>pihole</code>, a username + password, your Wi-Fi (if not using Ethernet), and your timezone.</span></li>
+        <li class="chk"><input type="checkbox" data-key="flash-ssh"><span class="t">In the <b>Services</b> tab, turn on <b>SSH</b> (password authentication). This lets you control the Pi with no screen attached.</span></li>
+        <li class="chk"><input type="checkbox" data-key="flash-write"><span class="t"><b>Write</b> the card, then put it in the Pi, connect the network, and power it on. Wait ~90 seconds.</span></li>
+      </ul>
+      <div class="callout warn"><b>Double-check the storage you pick</b> in the Imager — writing the card erases
+        everything on it. Make sure it’s the SD card, not a USB drive you care about.</div>
+      <p class="prose" style="color:var(--muted);font-size:.95rem">Full picture-by-picture version:
+        <code>pi-hole/scripts/flash-and-first-boot.md</code></p>
+    </section>
+
+    <!-- CONNECT -->
+    <section class="step" id="s-connect" data-step="connect">
+      <span class="eyebrow">Step 3</span>
+      <h2><span class="num">3.</span> Connect to the Pi from your computer</h2>
+      <p class="prose">Open a terminal — on Windows that’s <b>PowerShell</b> or <b>Windows Terminal</b>; on Mac
+        it’s <b>Terminal</b>. Type this (use the username you chose), and enter the password when asked:</p>
+      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="prompt">$ </span>ssh pi@pihole.local</code></pre></div>
+      <div class="callout tip"><b>If <code>pihole.local</code> doesn’t work:</b> open your router’s device list,
+        find the Pi’s IP address (like <code>192.168.1.42</code>), and use
+        <code>ssh pi@192.168.1.42</code> instead. Say <span class="kbd">yes</span> the first time it asks about a fingerprint.</div>
+      <ul class="checks" data-step="connect">
+        <li class="chk"><input type="checkbox" data-key="connect-in"><span class="t">You see a prompt ending in <code>pihole:~ $</code> — you’re <b>inside the Pi</b>. 🎉</span></li>
+      </ul>
+    </section>
+
+    <!-- INSTALL -->
+    <section class="step" id="s-install" data-step="install">
+      <span class="eyebrow">Step 4</span>
+      <h2><span class="num">4.</span> Run the installer</h2>
+      <p class="prose">Get the <b>kit</b> onto the Pi, set your password in one small file, and run <b>one</b> command;
+        the installer does the rest (updates, Pi-hole, family filtering, blocklists, and optionally private DNS).</p>
+      <p class="prose" style="margin:14px 0 4px"><b>On the Pi</b>, download the kit and open the settings file:</p>
+      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="prompt">$ </span>sudo apt-get update &amp;&amp; sudo apt-get install -y git
+<span class="prompt">$ </span>git clone https://github.com/Tamer-Gamal/pihole-family-shield.git
+<span class="prompt">$ </span>cd pihole-family-shield/scripts
+<span class="prompt">$ </span>cp setup.conf.example setup.conf
+<span class="prompt">$ </span>nano setup.conf</code></pre></div>
+      <div class="callout tip"><b>Prefer offline / no repo?</b> Copy the kit folder from your computer instead:
+        <code>scp -r ./pi-hole pi@pihole.local:~/</code> (or a USB stick), then <code>cd ~/pi-hole/scripts</code>.
+        Any method that lands the kit on the Pi works.</div>
+      <p class="prose">In <code>setup.conf</code>, change <b>one</b> thing you must: the admin password. Save with
+        <span class="kbd">Ctrl</span>+<span class="kbd">O</span>, <span class="kbd">Enter</span>, then exit with
+        <span class="kbd">Ctrl</span>+<span class="kbd">X</span>. (Want maximum privacy? Set
+        <code>INSTALL_UNBOUND="true"</code> too.) Then run the installer:</p>
+      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="prompt">$ </span>sudo ./bootstrap.sh</code></pre></div>
+      <div class="callout safe"><b>Where does Pi-hole actually come from?</b> This kit ships <b>no</b> copy of Pi-hole.
+        Under the hood, <code>bootstrap.sh</code> downloads and runs Pi-hole’s <b>official installer</b> straight from
+        the real project — <a href="https://install.pi-hole.net" target="_blank" rel="noopener">install.pi-hole.net</a>
+        (source: <a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">github.com/pi-hole/pi-hole</a>,
+        website <a href="https://pi-hole.net" target="_blank" rel="noopener">pi-hole.net</a>). So you always get their
+        genuine, security-patched release; our scripts only add the family filtering and setup on top.</div>
+      <ul class="checks" data-step="install">
+        <li class="chk"><input type="checkbox" data-key="install-pw"><span class="t">Changed <b>PIHOLE_ADMIN_PASSWORD</b> in <code>setup.conf</code>.</span></li>
+        <li class="chk"><input type="checkbox" data-key="install-run"><span class="t">Ran <code>sudo ./bootstrap.sh</code> and it finished with <b>“Pi-hole is ready!”</b> and an admin address.</span></li>
+        <li class="chk"><input type="checkbox" data-key="install-note"><span class="t">Wrote down the <b>admin page address</b> it printed (like <code>http://192.168.1.42/admin</code>).</span></li>
+      </ul>
+      <div class="callout safe"><b>It’s safe to re-run.</b> If anything hiccups (a dropped connection, a slow
+        mirror), just run <code>sudo ./bootstrap.sh</code> again — it picks up where it left off.</div>
+    </section>
+
+    <!-- ROUTER -->
+    <section class="step" id="s-router" data-step="router">
+      <span class="eyebrow">Step 5 · the important one</span>
+      <h2><span class="num">5.</span> Send your whole network through Pi-hole</h2>
+      <p class="prose">Right now only the Pi knows about itself. This step tells <b>your router</b> to hand out
+        the Pi as everyone’s phone book — so every device is protected automatically.</p>
+      <figure class="figure">
+        <svg viewBox="0 0 720 250" role="img" aria-label="The internet connects to your router. The router points all devices at the Pi-hole for DNS. Phones, laptops and TVs are all covered.">
+          <!-- internet -->
+          <g transform="translate(20,96)">
+            <ellipse cx="52" cy="30" rx="52" ry="30" fill="var(--raised-2)" stroke="var(--hair)"/>
+            <text x="52" y="35" text-anchor="middle" fill="var(--muted)" font-size="13">Internet</text>
+          </g>
+          <line x1="126" y1="126" x2="210" y2="126" stroke="var(--faint)" stroke-width="2" marker-end="url(#ar2)"/>
+          <!-- router -->
+          <g transform="translate(214,96)">
+            <rect x="0" y="0" width="120" height="60" rx="10" fill="var(--raised-2)" stroke="var(--hair)"/>
+            <text x="60" y="27" text-anchor="middle" fill="var(--ink)" font-size="13">Router</text>
+            <text x="60" y="45" text-anchor="middle" fill="var(--muted)" font-size="10.5">“use the Pi for DNS”</text>
+          </g>
+          <!-- to pihole -->
+          <line x1="334" y1="126" x2="418" y2="126" stroke="var(--safe)" stroke-width="2.4" marker-end="url(#arg2)"/>
+          <!-- pihole -->
+          <g transform="translate(422,92)">
+            <rect x="0" y="0" width="128" height="68" rx="12" fill="var(--raised)" stroke="var(--safe)"/>
+            <path d="M64 12l16 6v13c0 10-6.5 18-16 22-9.5-4-16-12-16-22V18z" fill="none" stroke="var(--safe)" stroke-width="1.8"/>
+            <text x="64" y="60" text-anchor="middle" fill="var(--ink)" font-size="12" font-weight="700">Pi-hole</text>
+          </g>
+          <!-- devices fan -->
+          <g stroke="var(--safe-dim)" stroke-width="1.8" stroke-dasharray="5 4">
+            <line x1="486" y1="160" x2="600" y2="46"/>
+            <line x1="486" y1="160" x2="620" y2="126"/>
+            <line x1="486" y1="160" x2="600" y2="206"/>
+          </g>
+          <g fill="var(--raised-2)" stroke="var(--hair)">
+            <g transform="translate(600,22)"><rect width="96" height="48" rx="9"/><text x="48" y="29" text-anchor="middle" fill="var(--ink)" font-size="12" font-family="var(--sans)">📱 Phones</text></g>
+            <g transform="translate(618,102)"><rect width="96" height="48" rx="9"/><text x="48" y="29" text-anchor="middle" fill="var(--ink)" font-size="12" font-family="var(--sans)">💻 Laptops</text></g>
+            <g transform="translate(600,182)"><rect width="96" height="48" rx="9"/><text x="48" y="29" text-anchor="middle" fill="var(--ink)" font-size="12" font-family="var(--sans)">📺 TVs</text></g>
+          </g>
+          <defs>
+            <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0l9 4.5L0 9z" fill="var(--faint)"/></marker>
+            <marker id="arg2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0l9 4.5L0 9z" fill="var(--safe)"/></marker>
+          </defs>
+        </svg>
+        <figcaption>Change DNS in <b>one</b> place — the router — and every device is covered.</figcaption>
+      </figure>
+      <div class="grid2">
+        <div class="card"><h3>Do this (recommended)</h3>
+          <p style="color:var(--muted)">In your router’s settings, find <b>DHCP</b> or <b>LAN</b> settings and set the
+            <b>DNS server</b> to your Pi’s IP address (the one from Step 4). Save, then reboot your devices (or turn
+            Wi-Fi off &amp; on).</p></div>
+        <div class="card"><h3>Also do this</h3>
+          <p style="color:var(--muted)">While you’re in the router, make a <b>DHCP reservation</b> for the Pi so its
+            address never changes. Look for “Reserve IP”, “Static lease”, or “Address reservation”, and pin the Pi
+            to its current IP.</p></div>
+      </div>
+      <ul class="checks" data-step="router">
+        <li class="chk"><input type="checkbox" data-key="router-dns"><span class="t">Set the router’s <b>DNS</b> to the Pi’s IP address.</span></li>
+        <li class="chk"><input type="checkbox" data-key="router-reserve"><span class="t">Made a <b>DHCP reservation</b> so the Pi keeps the same address.</span></li>
+        <li class="chk"><input type="checkbox" data-key="router-reboot"><span class="t">Rebooted a device (or toggled Wi-Fi) so it picks up the new setting.</span></li>
+      </ul>
+      <div class="callout warn"><b>Every router’s menus are named differently.</b> If you can’t find the DNS field,
+        search the web for <i>“[your router model] change DNS DHCP”</i>. The setting always exists — it’s just
+        hidden in a different place.</div>
+    </section>
+
+    <!-- VERIFY -->
+    <section class="step" id="s-verify" data-step="verify">
+      <span class="eyebrow">Step 6</span>
+      <h2><span class="num">6.</span> Check that it’s working</h2>
+      <p class="prose">Open the admin page (the address from Step 4) and log in with your password. Then browse
+        the web for a minute and watch the numbers move.</p>
+      <ul class="checks" data-step="verify">
+        <li class="chk"><input type="checkbox" data-key="verify-admin"><span class="t">The <b>admin dashboard</b> loads and you can log in.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-queries"><span class="t"><b>“Total queries”</b> is climbing — proof your devices are using the Pi.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-blocked"><span class="t"><b>“Queries blocked”</b> is above zero — ads &amp; trackers are being stopped.</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-feel"><span class="t">Sites feel a little <b>cleaner and faster</b>. 🎉</span></li>
+        <li class="chk"><input type="checkbox" data-key="verify-safesearch"><span class="t"><b>Family check:</b> on a device using the Pi, a Google image search for something mild-but-adult stays <b>SafeSearch-clean</b>, and a known adult site <b>won’t open</b>.</span></li>
+      </ul>
+      <div class="callout tip"><b>Want a definite test?</b> On a device using the Pi, visit
+        <code>http://pi.hole/admin</code> — if it opens, your device is going through Pi-hole. Many ad-heavy
+        news sites are the most satisfying “before/after”.</div>
+
+      <h3 style="margin:28px 0 4px">If something looks off</h3>
+      <details><summary>A website or app won’t load / a login is blocked</summary>
+        <div class="body"><p>Very rarely a blocklist is too aggressive. Open the admin page → <b>Query Log</b>,
+          find the <span style="color:var(--blocked)">red (blocked)</span> domain the site needs, and click
+          <b>Allow</b>. It’ll work within seconds — no reinstall needed.</p></div></details>
+      <details><summary>Numbers aren’t moving / devices aren’t using Pi-hole</summary>
+        <div class="body"><p>The router DNS change (Step 5) usually needs a device reboot or a Wi-Fi off/on to
+          take effect. Also confirm the Pi still has the same IP you set in the router. On the Pi you can run
+          <code>pihole status</code> to confirm it’s active.</p></div></details>
+      <details><summary>The Pi’s address changed and nothing resolves</summary>
+        <div class="body"><p>That’s why the DHCP <b>reservation</b> in Step 5 matters. Find the Pi’s new IP in
+          the router, update the router’s DNS setting to match, and make the reservation so it can’t drift again.</p></div></details>
+    </section>
+
+    <!-- FRIENDS -->
+    <section class="step" id="s-friends" data-step="friends">
+      <span class="eyebrow">Bonus</span>
+      <h2><span class="num">★</span> Make one for a friend</h2>
+      <p class="prose">The whole point of this kit is that the <b>second</b> Pi-hole takes ten minutes. Two ways:</p>
+      <div class="grid2">
+        <div class="card"><h3>Fresh + same settings</h3>
+          <p style="color:var(--muted)">Flash a new card, copy your edited <code>setup.conf</code> onto the new Pi,
+            and run <code>sudo ./bootstrap.sh</code>. Identical result, every time.</p></div>
+        <div class="card"><h3>Clone an existing one</h3>
+          <p style="color:var(--muted)">On your working Pi run <code>sudo ./backup.sh</code> to save a
+            <b>Teleporter</b> file, then on the new Pi restore it from <b>Settings → Teleporter → Restore</b> to copy
+            your exact allow/block lists.</p></div>
+      </div>
+      <div class="cmd"><button class="copy" type="button">Copy</button><pre><code><span class="cmt"># on your working Pi — save a portable backup you can restore anywhere</span>
+<span class="prompt">$ </span>sudo ./backup.sh</code></pre></div>
+      <div class="callout safe"><b>Keep them healthy:</b> once a month, run <code>sudo ./update.sh</code> on each Pi
+        to update the system, Pi-hole, and the blocklists.</div>
+    </section>
+
+    <footer>
+      <p><b>Home Shield</b> — a Homelab-Hive project. Everything here runs on your own Raspberry Pi; it’s independent
+        of any other homelab service. Your progress on this page is saved only in <i>this browser</i>, on
+        <i>this device</i> — nothing is uploaded.</p>
+      <p style="margin-top:10px">Made to be shared. Flash a card, hand a friend the address, and they’re protected in
+        an afternoon.</p>
+      <p style="margin-top:10px"><b>Credits:</b> Pi-hole® is free, open-source software by the Pi-hole team
+        (<a href="https://pi-hole.net" target="_blank" rel="noopener">pi-hole.net</a> ·
+        <a href="https://github.com/pi-hole/pi-hole" target="_blank" rel="noopener">source on GitHub</a>). This kit
+        <i>installs</i> Pi-hole from its official installer and adds configuration + this guide on top — it is an
+        independent project, not affiliated with or endorsed by the Pi-hole team. SafeSearch enforcement and the
+        blocklists are provided by their respective maintainers (HaGeZi, OISD, and others).</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LS = "pihole-guide:";
+  var steps = ["how","family","need","flash","connect","install","router","verify","friends"];
+
+  /* ---- theme ---- */
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = (t === "dark") ? "🌙 Dark" : "☀️ Light";
+    try{ localStorage.setItem(LS+"theme", t); }catch(e){}
+  }
+  try{ applyTheme(localStorage.getItem(LS+"theme") || "dark"); }catch(e){ applyTheme("dark"); }
+  themeBtn.addEventListener("click", function(){
+    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
+  /* ---- checkboxes: persist + drive progress ---- */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.chk input[type=checkbox]'));
+  boxes.forEach(function(b){
+    var k = LS + "chk:" + b.getAttribute("data-key");
+    try{ if(localStorage.getItem(k) === "1") b.checked = true; }catch(e){}
+    b.addEventListener("change", function(){
+      try{ localStorage.setItem(k, b.checked ? "1" : "0"); }catch(e){}
+      refresh();
+    });
+  });
+
+  function stepDone(step){
+    var items = document.querySelectorAll('.chk input[data-key]');
+    var inStep = Array.prototype.filter.call(items, function(i){
+      return i.closest('[data-step="'+step+'"]');
+    });
+    if(!inStep.length) return false;
+    return inStep.every(function(i){ return i.checked; });
+  }
+
+  function refresh(){
+    var total = boxes.length, done = boxes.filter(function(b){return b.checked;}).length;
+    var pct = total ? Math.round(done*100/total) : 0;
+    document.getElementById("pfill").style.width = pct + "%";
+    document.getElementById("ppct").textContent = pct + "%";
+    steps.forEach(function(s){
+      var link = document.querySelector('.rail a[data-step="'+s+'"]');
+      if(link){ link.classList.toggle("done", stepDone(s)); }
+    });
+  }
+  refresh();
+
+  /* ---- copy buttons ---- */
+  document.querySelectorAll(".cmd .copy").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var code = btn.parentElement.querySelector("code");
+      var text = code ? code.innerText.replace(/^\s*\$\s?/gm, "") : "";
+      var done = function(){
+        btn.textContent = "Copied!"; btn.classList.add("done");
+        setTimeout(function(){ btn.textContent = "Copy"; btn.classList.remove("done"); }, 1600);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(text); done(); });
+      } else { fallback(text); done(); }
+    });
+  });
+  function fallback(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---- scroll-spy for the rail ---- */
+  var sections = steps.map(function(s){ return document.getElementById("s-"+s); }).filter(Boolean);
+  var spy = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        var id = en.target.getAttribute("data-step");
+        document.querySelectorAll(".rail a").forEach(function(a){
+          a.classList.toggle("active", a.getAttribute("data-step") === id);
+        });
+      }
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  sections.forEach(function(s){ spy.observe(s); });
+})();
+</script>
+</body>
+</html>

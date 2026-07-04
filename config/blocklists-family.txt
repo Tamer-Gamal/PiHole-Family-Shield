@@ -1,0 +1,24 @@
+# ============================================================================
+#  FAMILY blocklists — adult / NSFW domains
+# ----------------------------------------------------------------------------
+#  Applied ON TOP of the normal ad/malware lists when FAMILY_MODE="true".
+#  These block known adult/pornographic DOMAINS for the whole network.
+#
+#  One URL per line. Lines starting with #  are ignored.
+#  Chosen because they are actively maintained and widely trusted.
+#
+#  Gambling and DNS-bypass (VPN / DoH) blocking are handled separately by
+#  family-filter.sh via the FAMILY_BLOCK_GAMBLING and BLOCK_DNS_BYPASS toggles
+#  in setup.conf — see that script for the exact lists it uses.
+#
+#  NOTE: no domain list is ever 100% complete. New adult sites appear daily and
+#  are added to these lists over time, but some will slip through until then.
+#  Treat this as a strong filter, not a guarantee — pair it with device-level
+#  parental controls and open conversations.
+# ============================================================================
+
+# HaGeZi's dedicated NSFW (pornography) blocklist — actively maintained
+https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/nsfw.txt
+
+# OISD NSFW — a second, independently-maintained adult list (good overlap safety)
+https://nsfw.oisd.nl
